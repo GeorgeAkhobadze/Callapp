@@ -2,7 +2,6 @@
 import { create } from 'zustand'
 
   export interface UserInterface {
-    city: any;
     id?: number,
     email: string,
     name: string,
@@ -42,7 +41,6 @@ const useStore = create<Store>((set) => ({
             users: addUser(state.users, user),
         }))
     },
-    deleteUser(users: UserInterface[])
 }))
 
 
