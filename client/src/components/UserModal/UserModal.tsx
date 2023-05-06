@@ -1,11 +1,11 @@
 import { Input, Modal, Form, Select, InputNumber, Button } from 'antd'
 import { Cities } from '../../assets/data/cities.data'
-import axios from 'axios'
 import useStore, { UserInterface } from '../../store'
 import { FC, useEffect, useState } from 'react'
 import { UserFormInterface } from '../../assets/interface/userForm.interface'
 import { log } from 'console'
 import './userModal.css'
+import { addUserAPI, updateUserAPI } from '../../API/API'
 
 interface Props {
     modalOpen: boolean
@@ -37,15 +37,12 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
                     '-' +
                     rest?.phone.substring(6),
             }
-
             if (userData === null) {
-                await axios
-                    .post('http://localhost:5000/data', body)
+                addUserAPI(body)
                     .then((res) => store.addUser(res.data))
                     .catch((err) => console.log(err))
-            } else {
-                await axios
-                    .put(`http://localhost:5000/data/${userData?.id}`, body)
+            } else if (userData !== null && userData?.id) {
+                updateUserAPI(userData?.id, body)
                     .then((res) => store.setUsers(res.data))
                     .catch((err) => console.log(err))
             }
@@ -58,7 +55,6 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
     }
 
     useEffect(() => {
-        console.log(userData)
         if (userData !== null) {
             form.setFieldsValue({
                 ...userData,

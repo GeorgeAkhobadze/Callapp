@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import logo from './logo.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
-
 import useStore, { UserInterface } from './store'
-import { Input, Button, Table, Modal, Form, Select, InputNumber } from 'antd'
-import axios from 'axios'
+import { Button, Table } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
 import UserModal from './components/UserModal/UserModal'
+import { deleteUserAPI, getAllUsersAPI } from './API/API'
 
 const TablePage = () => {
     const store = useStore()
@@ -53,7 +51,7 @@ const TablePage = () => {
         {
             title: 'Action',
             key: 'action',
-            render: (text: string, user: UserInterface) => (
+            render: (user: UserInterface) => (
                 <Button type='link' danger onClick={() => handleUserDelete(user.id)}>
                     <DeleteOutlined />
                 </Button>
@@ -61,19 +59,17 @@ const TablePage = () => {
         },
     ]
 
-    const handleUserDelete = async (id: any) => {
-        await axios.delete(`http://localhost:5000/data/${id}`).then((res) => store.setUsers(res.data))
-    }
-
     useEffect(() => {
-        console.log(clickedUser)
-    }, [clickedUser])
-    useEffect(() => {
-        axios
-            .get('http://localhost:5000/data')
+        getAllUsersAPI()
             .then((res) => store.setUsers(res.data.data))
             .catch((err) => console.log(err))
     }, [])
+
+    const handleUserDelete = (id: any) => {
+        deleteUserAPI(id)
+            .then((res) => store.setUsers(res.data))
+            .catch((err) => console.log(err))
+    }
 
     const handleUserCreate = () => {
         setClickedUser(null)
