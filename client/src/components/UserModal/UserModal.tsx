@@ -24,16 +24,6 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
         try {
             setLoading(true)
             const { city, street, ...rest } = values
-            console.log(
-                '+1' +
-                    ' (' +
-                    rest?.phone.substring(0, 3) +
-                    ')' +
-                    ' ' +
-                    rest?.phone.substring(3, 6) +
-                    '-' +
-                    rest?.phone.substring(6)
-            )
             const body = {
                 ...rest,
                 address: { city, street },
@@ -68,12 +58,15 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
     }
 
     useEffect(() => {
+        console.log(userData)
         if (userData !== null) {
             form.setFieldsValue({
                 ...userData,
                 ...userData?.address,
                 phone: `${userData?.phone.replace(/\D/g, '').slice(1)}`,
             })
+        } else {
+            form.resetFields()
         }
     }, [userData])
 
@@ -132,7 +125,7 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
                 <Form.Item
                     label='Street'
                     name='street'
-                    rules={[{ required: true, message: 'Please input your username!' }]}
+                    rules={[{ required: true, message: 'Please input your Street.' }]}
                 >
                     <Input placeholder='Street' />
                 </Form.Item>
