@@ -1,18 +1,38 @@
-import './App.css'
-import TablePage from './tablePage'
+import { FC, useState } from 'react'
+import { ConfigProvider, theme } from 'antd'
 import { Route, Routes } from 'react-router'
-import HeaderMenu from './components/HeaderMenu/HeaderMenu'
-import ChartsPage from './chartsPage'
+import { Navigate } from 'react-router-dom'
 
-function App() {
+import * as Styled from './StyledApp'
+import TablePage from 'page/usersPage/UsersPage'
+import ChartsPage from 'page/chartPage/ChartPage'
+import HeaderMenu from 'components/headerMenu/HeaderMenu'
+
+const App: FC = () => {
+    const [darkMode, setDarkMode] = useState<boolean>(true)
+
     return (
-        <div className='app'>
-            <HeaderMenu />
-            <Routes>
-                <Route path='/table' element={<TablePage />} />
-                <Route path='/charts' element={<ChartsPage />} />
-            </Routes>
-        </div>
+        <Styled.App darkMode={darkMode}>
+            <ConfigProvider
+                theme={
+                    darkMode
+                        ? {
+                              algorithm: theme.darkAlgorithm,
+                          }
+                        : {
+                              algorithm: theme.defaultAlgorithm,
+                          }
+                }
+            >
+                <HeaderMenu darkMode={darkMode} setDarkMode={setDarkMode} />
+
+                <Routes>
+                    <Route path='/' element={<Navigate to='/table' />} />
+                    <Route path='/table' element={<TablePage />} />
+                    <Route path='/charts' element={<ChartsPage />} />
+                </Routes>
+            </ConfigProvider>
+        </Styled.App>
     )
 }
 

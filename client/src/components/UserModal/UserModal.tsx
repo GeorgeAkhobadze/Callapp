@@ -1,11 +1,13 @@
-import { Input, Modal, Form, Select, InputNumber, Button } from 'antd'
-import { Cities } from '../../assets/data/cities.data'
-import useStore, { UserInterface } from '../../store'
 import { FC, useEffect, useState } from 'react'
-import { UserFormInterface } from '../../assets/interface/userForm.interface'
-import { log } from 'console'
-import './userModal.css'
-import { addUserAPI, updateUserAPI } from '../../API/API'
+import { Input, Modal, Form, Select, Button } from 'antd'
+
+import './UserModal.css'
+
+import { UserFormInterface } from 'assets/interface/userForm.interface'
+import { UserInterface } from 'assets/interface/user.interface'
+import { Cities } from 'assets/data/cities.data'
+import useUser from 'assets/hooks/useUser.hook'
+import { formatPhone, parseNumber } from 'assets/helpers/formatPhone.helper'
 
 interface Props {
     modalOpen: boolean
@@ -15,55 +17,40 @@ interface Props {
 }
 
 const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }) => {
-    const store = useStore()
     const [form] = Form.useForm()
+    const { handleUserUpdate, handleUserCreation } = useUser()
 
     const [loading, setLoading] = useState<boolean>(false)
 
     const handleUserAdd = async (values: UserFormInterface) => {
         try {
             setLoading(true)
-            const { city, street, ...rest } = values
+            const { city, street, phone, ...rest } = values
             const body = {
                 ...rest,
                 address: { city, street },
-                phone:
-                    '+1' +
-                    ' (' +
-                    rest?.phone.substring(0, 3) +
-                    ')' +
-                    ' ' +
-                    rest?.phone.substring(3, 6) +
-                    '-' +
-                    rest?.phone.substring(6),
+                phone: formatPhone(phone),
             }
-            if (userData === null) {
-                addUserAPI(body)
-                    .then((res) => store.addUser(res.data))
-                    .catch((err) => console.log(err))
-            } else if (userData !== null && userData?.id) {
-                updateUserAPI(userData?.id, body)
-                    .then((res) => store.setUsers(res.data))
-                    .catch((err) => console.log(err))
-            }
+
+            if (userData === null) handleUserCreation(body)
+            else if (userData !== null && userData?.id) handleUserUpdate(userData?.id, body)
+        } catch (err) {
+            alert(err)
+        } finally {
             setUserData(null)
             setModalOpen(false)
             setLoading(false)
-        } catch (err) {
-            alert(err)
         }
     }
 
     useEffect(() => {
-        if (userData !== null) {
+        if (userData !== null && typeof userData !== 'undefined')
             form.setFieldsValue({
                 ...userData,
                 ...userData?.address,
-                phone: `${userData?.phone.replace(/\D/g, '').slice(1)}`,
+                phone: parseNumber(userData?.phone),
             })
-        } else {
-            form.resetFields()
-        }
+        else form.resetFields()
     }, [userData])
 
     return (

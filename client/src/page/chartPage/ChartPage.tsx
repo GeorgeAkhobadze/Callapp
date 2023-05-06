@@ -1,31 +1,33 @@
-import React, { useState, useEffect } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { Pie } from '@ant-design/plots'
-import useStore from './store'
-import { getAllUsersAPI } from './API/API'
+
+import useStore from 'store/store'
+import { UserInterface } from 'assets/interface/user.interface'
+import useUser from 'assets/hooks/useUser.hook'
 
 interface CityCount {
     type: string
     value: number
 }
 
-const ChartsPage: React.FC = () => {
+const ChartPage: FC = () => {
     const store = useStore()
+    const { handleUserFetching } = useUser()
+
     const [cityCounts, setCityCounts] = useState<CityCount[]>([])
 
     useEffect(() => {
-        if (store.users.length <= 0) {
-            getAllUsersAPI()
-                .then((res) => store.setUsers(res.data.data))
-                .catch((err) => console.log(err))
-        }
+        handleUserFetching()
     }, [])
 
     useEffect(() => {
         const cities: { [key: string]: number } = {}
-        store.users.forEach((user) => {
+
+        store.users.forEach((user: UserInterface) => {
             const city = user.address.city
             cities[city] = cities[city] ? cities[city] + 1 : 1
         })
+
         const cityCounts = Object.entries(cities).map(([city, value]) => ({
             type: city,
             value,
@@ -48,7 +50,8 @@ const ChartsPage: React.FC = () => {
             },
         ],
     }
+
     return <Pie {...config} />
 }
 
-export default ChartsPage
+export default ChartPage
