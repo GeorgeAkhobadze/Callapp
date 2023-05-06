@@ -1,3 +1,5 @@
+import { notification } from 'antd'
+
 import { GetAllUsers, DeleteUser, UpdateUser, CreateUser } from 'api/user.api'
 import { CreateUserInterface } from 'assets/interface/createUser.interface'
 import { UserInterface } from 'assets/interface/user.interface'
@@ -14,7 +16,12 @@ const useUser = (): {
     const handleUserDelete = (id: number): void => {
         DeleteUser(id)
             .then((res) => store.setUsers(res.data))
-            .catch((err) => console.log(err))
+            .catch(() =>
+                notification['error']({
+                    message: 'Error',
+                    description: 'There was a problem while deleting the user.',
+                })
+            )
     }
 
     const handleUserFetching = async (): Promise<void> => {
@@ -24,7 +31,10 @@ const useUser = (): {
                 store.setUsers(data.data)
             }
         } catch (err) {
-            console.log(err)
+            notification['error']({
+                message: 'Error',
+                description: 'There was a problem while fetching the users.',
+            })
         }
     }
 
@@ -33,7 +43,10 @@ const useUser = (): {
             const { data }: { data: UserInterface[] } = await UpdateUser(id, body)
             store.setUsers(data)
         } catch (err) {
-            console.log(err)
+            notification['error']({
+                message: 'Error',
+                description: 'There was a problem while updating the user.',
+            })
         }
     }
 
@@ -42,7 +55,10 @@ const useUser = (): {
             const { data }: { data: UserInterface } = await CreateUser(body)
             store.addUser(data)
         } catch (err) {
-            console.log(err)
+            notification['error']({
+                message: 'Error',
+                description: 'There was a problem while creating the user.',
+            })
         }
     }
 

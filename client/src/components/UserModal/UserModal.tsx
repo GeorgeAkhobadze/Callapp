@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Input, Modal, Form, Select, Button } from 'antd'
+import { Input, Modal, Form, Select, Button, notification } from 'antd'
 
 import './UserModal.css'
 
@@ -32,13 +32,16 @@ const UserModal: FC<Props> = ({ modalOpen, setModalOpen, userData, setUserData }
                 phone: formatPhone(phone),
             }
 
-            if (userData === null) handleUserCreation(body)
-            else if (userData !== null && userData?.id) handleUserUpdate(userData?.id, body)
-        } catch (err) {
-            alert(err)
-        } finally {
-            setUserData(null)
+            if (userData === null) await handleUserCreation(body)
+            else if (userData !== null && userData?.id) await handleUserUpdate(userData?.id, body)
             setModalOpen(false)
+            setUserData(null)
+        } catch (err) {
+            notification['error']({
+                message: 'Error',
+                description: 'There was a problem while creating the user.',
+            })
+        } finally {
             setLoading(false)
         }
     }

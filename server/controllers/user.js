@@ -39,7 +39,6 @@ export const updateUser = async (req, res) => {
 
             if (itemIndex !== -1) {
                 json[itemIndex] = { ...json[itemIndex], ...body }
-                console.log(body)
                 fs.writeFile('data.json', JSON.stringify(json), (err) => {
                     if (err) throw err
                     res.status(200).json(json)
@@ -61,7 +60,7 @@ export const deleteUser = async (req, res) => {
             const json = JSON.parse(data)
             const filteredData = json.filter((x) => x.id != params.id)
             fs.writeFileSync('data.json', JSON.stringify(filteredData))
-            console.log(filteredData)
+
             res.status(200).json(filteredData)
         })
     } catch (error) {
